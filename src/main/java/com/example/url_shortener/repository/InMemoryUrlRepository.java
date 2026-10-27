@@ -1,11 +1,13 @@
 package com.example.url_shortener.repository;
 
 import com.example.url_shortener.model.ShortUrl;
+import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+@Repository
 public class InMemoryUrlRepository {
     private final ConcurrentHashMap<String, ShortUrl> storage = new ConcurrentHashMap<>();
 
