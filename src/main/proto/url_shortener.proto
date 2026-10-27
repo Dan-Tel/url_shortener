@@ -1,0 +1,36 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "com.example.url_shortener.grpc.generated";
+
+service UrlShortenerService {
+  rpc ResolveUrl(ResolveUrlRequest) returns (ResolveUrlResponse);
+  rpc CreateUrl(CreateUrlRequest) returns (CreateUrlResponse);
+  rpc DeleteUrl(DeleteUrlRequest) returns (DeleteUrlResponse);
+}
+
+message ResolveUrlRequest {
+  string short_code = 1;
+}
+
+message ResolveUrlResponse {
+  string original_url = 1;
+}
+
+message CreateUrlRequest {
+  string original_url = 1;
+  int32 ttl_hours = 2;
+}
+
+message CreateUrlResponse {
+  string short_code = 1;
+  string original_url = 2;
+  string expires_at = 3;
+}
+
+message DeleteUrlRequest {
+  string short_code = 1;
+}
+
+message DeleteUrlResponse {
+}

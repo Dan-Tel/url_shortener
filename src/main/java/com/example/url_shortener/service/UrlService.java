@@ -55,19 +55,4 @@ public class UrlService {
     public boolean deleteUrl(String shortCode, String ownerId) {
         return repository.softDelete(shortCode, ownerId);
     }
-//
-//    public static void main(String[] args) {
-//        InMemoryUrlRepository repository = new InMemoryUrlRepository();
-//        ShortCodeGenerator generator = new ShortCodeGenerator();
-//
-//        UrlService service = new UrlService(generator, repository);
-//
-//        ShortUrl shortUrl = service.createUrl("https://youtube.com", "Daniyar", Duration.ofHours(24));
-//
-//        System.out.println(service.resolveUrl(shortUrl.shortCode()));
-//        System.out.println(shortUrl.shortCode());
-//        System.out.println(shortUrl.originalUrl());
-//        System.out.println(shortUrl.createdAt());
-//        System.out.println(shortUrl.expiresAt());
-//    }
 }
