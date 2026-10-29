@@ -28,8 +28,8 @@ public class UrlController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public CreateUrlResponse create(@RequestBody CreateUrlRequest request) {
-        ShortUrl shortUrl = service.createUrl(request.originalUrl(), "test-user", Duration.ofHours(request.ttlHours()));
+    public CreateUrlResponse create(@RequestBody CreateUrlRequest request, @RequestHeader("Idempotency-Key") String idempotencyKey) {
+        ShortUrl shortUrl = service.createIdempotentUrl(request.originalUrl(), "test-user", Duration.ofHours(request.ttlHours()), idempotencyKey);
         return new CreateUrlResponse(shortUrl.shortCode(), shortUrl.originalUrl(), shortUrl.expiresAt());
     }
 

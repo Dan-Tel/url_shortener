@@ -1,5 +1,6 @@
 package com.example.url_shortener.grpc;
 
+import com.example.url_shortener.exception.IdempotencyConflictException;
 import com.example.url_shortener.model.ShortUrl;
 import com.example.url_shortener.service.UrlService;
 import com.example.url_shortener.grpc.generated.*;
@@ -35,12 +36,14 @@ public class UrlGrpcService extends UrlShortenerServiceGrpc.UrlShortenerServiceI
     @Override
     public void createUrl(CreateUrlRequest request, StreamObserver<CreateUrlResponse> responseObserver) {
         try {
-            ShortUrl shortUrl = service.createUrl(request.getOriginalUrl(), "test-user", Duration.ofHours(request.getTtlHours()));
+            ShortUrl shortUrl = service.createIdempotentUrl(request.getOriginalUrl(), "test-user", Duration.ofHours(request.getTtlHours()), request.getIdempotencyKey());
             CreateUrlResponse response = CreateUrlResponse.newBuilder().setShortCode(shortUrl.shortCode()).setOriginalUrl(shortUrl.originalUrl()).setExpiresAt(shortUrl.expiresAt().toString()).build();
             responseObserver.onNext(response);
             responseObserver.onCompleted();
         } catch (IllegalArgumentException ex) {
             responseObserver.onError(Status.INVALID_ARGUMENT.withDescription(ex.getMessage()).asRuntimeException());
+        } catch (IdempotencyConflictException ex) {
+            responseObserver.onError(Status.ALREADY_EXISTS.withDescription(ex.getMessage()).asRuntimeException());
         }
     }
 

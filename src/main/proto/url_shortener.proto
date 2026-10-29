@@ -20,6 +20,7 @@ message ResolveUrlResponse {
 message CreateUrlRequest {
   string original_url = 1;
   int32 ttl_hours = 2;
+  string idempotency_key = 3;
 }
 
 message CreateUrlResponse {

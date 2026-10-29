@@ -1,6 +1,10 @@
 package com.example.url_shortener.service;
 
+import com.example.url_shortener.exception.IdempotencyConflictException;
+import com.example.url_shortener.model.IdempotencyKey;
+import com.example.url_shortener.model.IdempotencyRecord;
 import com.example.url_shortener.model.ShortUrl;
+import com.example.url_shortener.repository.IdempotencyRepository;
 import com.example.url_shortener.repository.InMemoryUrlRepository;
 import org.springframework.stereotype.Service;
 
@@ -13,10 +17,12 @@ public class UrlService {
     private static final int MAX_TRIES = 5;
     private final ShortCodeGenerator generator;
     private final InMemoryUrlRepository repository;
+    private final IdempotencyRepository idempotencyRepository;
 
-    public UrlService(ShortCodeGenerator generator, InMemoryUrlRepository repository) {
+    public UrlService(ShortCodeGenerator generator, InMemoryUrlRepository repository, IdempotencyRepository idempotencyRepository) {
         this.generator = generator;
         this.repository = repository;
+        this.idempotencyRepository = idempotencyRepository;
     }
 
     public ShortUrl createUrl(String originalUrl, String ownerId, Duration ttl) {
@@ -40,6 +46,17 @@ public class UrlService {
         }
 
         throw new IllegalStateException("Не получилось сгенерировать shortUrl");
+    }
+
+    public ShortUrl createIdempotentUrl(String originalUrl, String ownerId, Duration ttl, String idempotencyKey) {
+        IdempotencyKey key = new IdempotencyKey(ownerId, idempotencyKey);
+        IdempotencyRecord savedRecord = idempotencyRepository.getOrCreate(key, () -> new IdempotencyRecord(originalUrl, ttl, createUrl(originalUrl, ownerId, ttl)));
+
+        if (!savedRecord.originalUrl().equals(originalUrl) || !savedRecord.ttl().equals(ttl)) {
+            throw new IdempotencyConflictException("Idempotency-Key уже создан с другими параметрами");
+        }
+
+        return savedRecord.result();
     }
 
     public String resolveUrl(String shortCode) {
