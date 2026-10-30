@@ -1,6 +1,8 @@
 package com.example.url_shortener.repository;
 
 import com.example.url_shortener.model.ShortUrl;
+import io.micrometer.core.instrument.Counter;
+import io.micrometer.core.instrument.MeterRegistry;
 import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Profile;
 import org.springframework.dao.DataAccessException;
@@ -17,6 +19,9 @@ import java.util.logging.Logger;
 @Primary
 @Profile("postgres & redis")
 public class CachedUrlRepository implements UrlRepository {
+    private final Counter cacheHits;
+    private final Counter cacheMisses;
+    private final Counter cacheErrors;
 
     private static final Logger log =
             Logger.getLogger(CachedUrlRepository.class.getName());
@@ -29,10 +34,15 @@ public class CachedUrlRepository implements UrlRepository {
 
     public CachedUrlRepository(
             PostgresUrlRepository postgresRepository,
-            StringRedisTemplate redisTemplate
+            StringRedisTemplate redisTemplate,
+            MeterRegistry meterRegistry
     ) {
         this.postgresRepository = postgresRepository;
         this.redisTemplate = redisTemplate;
+
+        this.cacheHits = meterRegistry.counter("url.cache.hits");
+        this.cacheMisses = meterRegistry.counter("url.cache.misses");
+        this.cacheErrors = meterRegistry.counter("url.cache.errors");
     }
 
     @Override
@@ -52,14 +62,18 @@ public class CachedUrlRepository implements UrlRepository {
                 ShortUrl url = fromHash(shortCode, cached);
 
                 if (url.isAccessible(Instant.now())) {
+                    cacheHits.increment();
                     return Optional.of(url);
                 }
 
                 redisTemplate.delete(key);
             }
         } catch (DataAccessException e) {
+            cacheErrors.increment();
             log.warning("Redis ошибка чтения: " + e.getMessage());
         }
+
+        cacheMisses.increment();
 
         Optional<ShortUrl> result =
                 postgresRepository.findByCode(shortCode);
@@ -85,6 +99,7 @@ public class CachedUrlRepository implements UrlRepository {
                 redisTemplate.opsForHash().putAll(key, toHash(url));
                 redisTemplate.expire(key, ttl);
             } catch (DataAccessException e) {
+                cacheErrors.increment();
                 log.warning("Redis ошибка записи: " + e.getMessage());
             }
         });
@@ -100,6 +115,7 @@ public class CachedUrlRepository implements UrlRepository {
             try {
                 redisTemplate.delete(KEY_PREFIX + shortCode);
             } catch (DataAccessException e) {
+                cacheErrors.increment();
                 log.warning("Redis ошибка инвалидации: " + e.getMessage());
             }
         }

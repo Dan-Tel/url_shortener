@@ -4,3 +4,9 @@ spring:
       host: localhost
       port: 6379
       timeout: 2s
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus,metrics
