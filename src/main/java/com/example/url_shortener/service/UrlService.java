@@ -5,7 +5,9 @@ import com.example.url_shortener.model.IdempotencyKey;
 import com.example.url_shortener.model.IdempotencyRecord;
 import com.example.url_shortener.model.ShortUrl;
 import com.example.url_shortener.repository.IdempotencyRepository;
+import com.example.url_shortener.repository.IdempotencyStore;
 import com.example.url_shortener.repository.InMemoryUrlRepository;
+import com.example.url_shortener.repository.UrlRepository;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
@@ -16,13 +18,13 @@ import java.util.NoSuchElementException;
 public class UrlService {
     private static final int MAX_TRIES = 5;
     private final ShortCodeGenerator generator;
-    private final InMemoryUrlRepository repository;
-    private final IdempotencyRepository idempotencyRepository;
+    private final UrlRepository repository;
+    private final IdempotencyStore idempotencyStore;
 
-    public UrlService(ShortCodeGenerator generator, InMemoryUrlRepository repository, IdempotencyRepository idempotencyRepository) {
+    public UrlService(ShortCodeGenerator generator, UrlRepository repository, IdempotencyStore idempotencyStore) {
         this.generator = generator;
         this.repository = repository;
-        this.idempotencyRepository = idempotencyRepository;
+        this.idempotencyStore = idempotencyStore;
     }
 
     public ShortUrl createUrl(String originalUrl, String ownerId, Duration ttl) {
@@ -50,7 +52,7 @@ public class UrlService {
 
     public ShortUrl createIdempotentUrl(String originalUrl, String ownerId, Duration ttl, String idempotencyKey) {
         IdempotencyKey key = new IdempotencyKey(ownerId, idempotencyKey);
-        IdempotencyRecord savedRecord = idempotencyRepository.getOrCreate(key, () -> new IdempotencyRecord(originalUrl, ttl, createUrl(originalUrl, ownerId, ttl)));
+        IdempotencyRecord savedRecord = idempotencyStore.getOrCreate(key, originalUrl, ttl, () -> createUrl(originalUrl, ownerId, ttl));
 
         if (!savedRecord.originalUrl().equals(originalUrl) || !savedRecord.ttl().equals(ttl)) {
             throw new IdempotencyConflictException("Idempotency-Key уже создан с другими параметрами");

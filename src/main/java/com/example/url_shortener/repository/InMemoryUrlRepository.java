@@ -1,6 +1,7 @@
 package com.example.url_shortener.repository;
 
 import com.example.url_shortener.model.ShortUrl;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
@@ -8,7 +9,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 @Repository
-public class InMemoryUrlRepository {
+@Profile("memory")
+public class InMemoryUrlRepository implements UrlRepository {
     private final ConcurrentHashMap<String, ShortUrl> storage = new ConcurrentHashMap<>();
 
     public boolean saveIfAbsent(ShortUrl url) {
