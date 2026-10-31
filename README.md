@@ -183,6 +183,8 @@ All runs used 100 target RPS, three repetitions, with **zero failed checks and z
 
 ![img_3.png](benchmarks/charts/create/img_3.png)
 
+![img_4.png](benchmarks/charts/delete/img_4.png)
+
 ### Serialized payload sizes
 
 Measured application **message bodies only**, in bytes:
@@ -195,5 +197,3 @@ Measured application **message bodies only**, in bytes:
 | READ response | 92 | 76 |
 | DELETE request body | 0 | 10 |
 | DELETE response | 0 | 0 |
-
-![img_4.png](benchmarks/charts/delete/img_4.png)
