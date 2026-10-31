@@ -30,7 +30,7 @@ The project implements URL creation, resolution, and deletion using the same bus
 | Build | Maven |
 
 ## Architecture
-![mermaid-diagram.png](mermaid-diagram.png)
+![mermaid-diagram.png](src/main/resources/static/mermaid-diagram.png)
 
 Both APIs call the same application service. Redis is an optional read cache; PostgreSQL remains the persistent source of truth. In-memory mode is available for local development.
 
@@ -136,7 +136,7 @@ The Java REST and gRPC clients use a shared retry policy:
 | REST retry conditions | I/O failures; HTTP 502, 503, 504 |
 | gRPC retry conditions | `UNAVAILABLE`, `DEADLINE_EXCEEDED` |
 
-![mermaid-diagram(3).png](mermaid-diagram(3).png)
+![mermaid-diagram(3).png](src/main/resources/static/mermaid-diagram(3).png)
 
 ## Performance benchmarks
 
