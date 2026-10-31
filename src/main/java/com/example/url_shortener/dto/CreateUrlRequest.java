@@ -1,4 +1,13 @@
 package com.example.url_shortener.dto;
 
-public record CreateUrlRequest(String originalUrl, int ttlHours) {
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
+
+public record CreateUrlRequest(
+        @NotBlank
+        @Size(max = 2048)
+        String originalUrl,
+
+        int ttlHours
+) {
 }

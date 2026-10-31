@@ -6,13 +6,17 @@ import com.example.url_shortener.model.IdempotencyRecord;
 import com.example.url_shortener.model.ShortUrl;
 import com.example.url_shortener.repository.IdempotencyStore;
 import com.example.url_shortener.repository.UrlRepository;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
 
 import java.time.Duration;
 import java.time.Instant;
 import java.util.NoSuchElementException;
 
 @Service
+@Validated
 public class UrlService {
     private static final int MAX_TRIES = 5;
     private static final int MAX_URL_LENGTH = 2048;
@@ -33,8 +37,8 @@ public class UrlService {
     }
 
     public ShortUrl createUrl(
-            String originalUrl,
-            String ownerId,
+            @NotBlank @Size(max = 2048) String originalUrl,
+            @NotBlank @Size(max = 128) String ownerId,
             Duration ttl
     ) {
         validateOriginalUrl(originalUrl);
@@ -71,10 +75,10 @@ public class UrlService {
     }
 
     public ShortUrl createIdempotentUrl(
-            String originalUrl,
-            String ownerId,
+            @NotBlank @Size(max = 2048) String originalUrl,
+            @NotBlank @Size(max = 128) String ownerId,
             Duration ttl,
-            String idempotencyKey
+            @NotBlank String idempotencyKey
     ) {
         validateOriginalUrl(originalUrl);
         validateOwnerId(ownerId);
@@ -113,7 +117,10 @@ public class UrlService {
         return shortUrl.originalUrl();
     }
 
-    public boolean deleteUrl(String shortCode, String ownerId) {
+    public boolean deleteUrl(
+            String shortCode,
+            @NotBlank @Size(max = 128) String ownerId
+    ) {
         validateOwnerId(ownerId);
         return repository.softDelete(shortCode, ownerId);
     }

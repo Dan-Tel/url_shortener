@@ -5,6 +5,8 @@ import com.example.url_shortener.dto.CreateUrlResponse;
 import com.example.url_shortener.dto.ResolveUrlResponse;
 import com.example.url_shortener.model.ShortUrl;
 import com.example.url_shortener.service.UrlService;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -28,9 +30,22 @@ public class UrlController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public CreateUrlResponse create(@RequestBody CreateUrlRequest request, @RequestHeader("Idempotency-Key") String idempotencyKey) {
-        ShortUrl shortUrl = service.createIdempotentUrl(request.originalUrl(), "test-user", Duration.ofHours(request.ttlHours()), idempotencyKey);
-        return new CreateUrlResponse(shortUrl.shortCode(), shortUrl.originalUrl(), shortUrl.expiresAt());
+    public CreateUrlResponse create(
+            @Valid @RequestBody CreateUrlRequest request,
+            @NotBlank @RequestHeader("Idempotency-Key") String idempotencyKey
+    ) {
+        ShortUrl shortUrl = service.createIdempotentUrl(
+                request.originalUrl(),
+                "test-user",
+                Duration.ofHours(request.ttlHours()),
+                idempotencyKey
+        );
+
+        return new CreateUrlResponse(
+                shortUrl.shortCode(),
+                shortUrl.originalUrl(),
+                shortUrl.expiresAt()
+        );
     }
 
     @DeleteMapping("/{shortCode}")

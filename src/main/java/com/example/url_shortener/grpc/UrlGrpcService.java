@@ -6,6 +6,7 @@ import com.example.url_shortener.service.UrlService;
 import com.example.url_shortener.grpc.generated.*;
 import io.grpc.Status;
 import io.grpc.stub.StreamObserver;
+import jakarta.validation.ConstraintViolationException;
 import org.springframework.grpc.server.service.GrpcService;
 
 import java.time.Duration;
@@ -40,10 +41,18 @@ public class UrlGrpcService extends UrlShortenerServiceGrpc.UrlShortenerServiceI
             CreateUrlResponse response = CreateUrlResponse.newBuilder().setShortCode(shortUrl.shortCode()).setOriginalUrl(shortUrl.originalUrl()).setExpiresAt(shortUrl.expiresAt().toString()).build();
             responseObserver.onNext(response);
             responseObserver.onCompleted();
-        } catch (IllegalArgumentException ex) {
-            responseObserver.onError(Status.INVALID_ARGUMENT.withDescription(ex.getMessage()).asRuntimeException());
+        } catch (ConstraintViolationException | IllegalArgumentException ex) {
+            responseObserver.onError(
+                    Status.INVALID_ARGUMENT
+                            .withDescription(ex.getMessage())
+                            .asRuntimeException()
+            );
         } catch (IdempotencyConflictException ex) {
-            responseObserver.onError(Status.ALREADY_EXISTS.withDescription(ex.getMessage()).asRuntimeException());
+            responseObserver.onError(
+                    Status.ALREADY_EXISTS
+                            .withDescription(ex.getMessage())
+                            .asRuntimeException()
+            );
         }
     }
 
