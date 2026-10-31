@@ -1,0 +1,18 @@
+{
+	"ulid": "01M6858E5J4V4E5NPB43GVKA81",
+	"minTime": 1793412000000,
+	"maxTime": 1793419200000,
+	"stats": {
+		"numSamples": 1732275,
+		"numFloatSamples": 1732275,
+		"numSeries": 26354,
+		"numChunks": 38097
+	},
+	"compaction": {
+		"level": 1,
+		"sources": [
+			"01M6858E5J4V4E5NPB43GVKA81"
+		]
+	},
+	"version": 1
+}

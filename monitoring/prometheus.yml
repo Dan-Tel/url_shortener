@@ -4,9 +4,14 @@ global:
 scrape_configs:
   - job_name: prometheus
     static_configs:
-      - targets: ["localhost:9091"]
+      - targets: ["127.0.0.1:9091"]
 
   - job_name: url-shortener
+    scheme: https
     metrics_path: /actuator/prometheus
+
+    tls_config:
+      insecure_skip_verify: true
+
     static_configs:
-      - targets: ["localhost:8080"]
+      - targets: ["127.0.0.1:8443"]

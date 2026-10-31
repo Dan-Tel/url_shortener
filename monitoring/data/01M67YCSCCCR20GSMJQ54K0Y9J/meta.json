@@ -1,0 +1,18 @@
+{
+	"ulid": "01M67YCSCCCR20GSMJQ54K0Y9J",
+	"minTime": 1793404802753,
+	"maxTime": 1793412000000,
+	"stats": {
+		"numSamples": 1794240,
+		"numFloatSamples": 1794240,
+		"numSeries": 1246,
+		"numChunks": 14958
+	},
+	"compaction": {
+		"level": 1,
+		"sources": [
+			"01M67YCSCCCR20GSMJQ54K0Y9J"
+		]
+	},
+	"version": 1
+}

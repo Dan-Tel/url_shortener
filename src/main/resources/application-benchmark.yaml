@@ -1,0 +1,30 @@
+server:
+  port: 8443
+
+  ssl:
+    enabled: true
+    key-store: file:benchmarks/certs/benchmark.p12
+    key-store-type: PKCS12
+    key-store-password: ${BENCHMARK_KEYSTORE_PASSWORD}
+    key-alias: url-shortener
+
+  http2:
+    enabled: ${BENCHMARK_HTTP2:false}
+
+spring:
+  ssl:
+    bundle:
+      jks:
+        grpc-benchmark:
+          key:
+            alias: url-shortener
+          keystore:
+            location: file:benchmarks/certs/benchmark.p12
+            password: ${BENCHMARK_KEYSTORE_PASSWORD}
+            type: PKCS12
+
+  grpc:
+    server:
+      port: 9090
+      ssl:
+        bundle: grpc-benchmark

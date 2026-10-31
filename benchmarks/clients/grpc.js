@@ -16,7 +16,7 @@ let connected = false;
 function ensureConnected() {
     if (!connected) {
         client.connect(config.grpcAddress, {
-            plaintext: true,
+            plaintext: __ENV.GRPC_TLS !== 'true',
             timeout: '2s',
         });
 

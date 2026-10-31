@@ -39,8 +39,8 @@ export const options = {
             rate: config.rps,
             timeUnit: '1s',
             duration: config.duration,
-            preAllocatedVUs: 30,
-            maxVUs: 100,
+            preAllocatedVUs: 200,
+            maxVUs: 600,
         },
     },
 };
@@ -69,8 +69,17 @@ export default function () {
     if (config.protocol === 'rest') {
         const response = resolveUrl(shortCode);
 
+        const expectedProto = __ENV.EXPECTED_HTTP_VERSION;
+
         check(response, {
             'REST status 200': (r) => r.status === 200,
+
+            ...(expectedProto
+                ? {
+                    'Expected HTTP version': (r) =>
+                        r.proto === expectedProto,
+                }
+                : {}),
         });
 
         return;

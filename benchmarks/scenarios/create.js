@@ -20,8 +20,8 @@ export const options = {
             rate: config.rps,
             timeUnit: '1s',
             duration: config.duration,
-            preAllocatedVUs: 30,
-            maxVUs: 100,
+            preAllocatedVUs: 200,
+            maxVUs: 600,
         },
     },
 
