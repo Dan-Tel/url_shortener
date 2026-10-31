@@ -30,28 +30,7 @@ The project implements URL creation, resolution, and deletion using the same bus
 | Build | Maven |
 
 ## Architecture
-
-```text
-                     Clients / k6
-                           |
-            +--------------+--------------+
-            |              |              |
-       REST HTTP/1.1  REST HTTP/2     gRPC HTTP/2
-         JSON            JSON           Proto
-            |              |              |
-            +-------+------+--------------+
-                    |
-          REST Controller / gRPC Service
-                    |
-                 UrlService
-                    |
-             Repository abstraction
-                    |
-           +--------+---------+------------------+
-           |                  |                  |
-     Redis cache-aside    PostgreSQL         In-memory
-       (read cache)      (source of truth)
-```
+![mermaid-diagram.png](mermaid-diagram.png)
 
 Both APIs call the same application service. Redis is an optional read cache; PostgreSQL remains the persistent source of truth. In-memory mode is available for local development.
 
@@ -156,6 +135,8 @@ The Java REST and gRPC clients use a shared retry policy:
 | Backoff | Exponential with jitter |
 | REST retry conditions | I/O failures; HTTP 502, 503, 504 |
 | gRPC retry conditions | `UNAVAILABLE`, `DEADLINE_EXCEEDED` |
+
+![mermaid-diagram(3).png](mermaid-diagram(3).png)
 
 ## Performance benchmarks
 
